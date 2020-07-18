@@ -6,6 +6,7 @@ import {
   View,
   Platform,
 } from 'react-native';
+import PropTypes from 'prop-types';
 
 export default class SearchInput extends React.Component {
 
@@ -15,6 +16,8 @@ export default class SearchInput extends React.Component {
       text: '',
     }
   }
+
+
 
   handleChangeText = (text) => {
     this.setState({ text: text });
@@ -52,6 +55,15 @@ export default class SearchInput extends React.Component {
     );
   }
 }
+
+SearchInput.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
+  placeholder: PropTypes.string,
+};
+
+SearchInput.defaultProps = {
+  placeholder: '',
+};
 
 const styles = StyleSheet.create({
   container: {
