@@ -1,5 +1,3 @@
-import uuidv4 from 'uuid/v4';
-
 export const millisecondsToHuman = ms => {
   const seconds = Math.floor((ms / 1000) % 60);
   const minutes = Math.floor((ms / 1000 / 60) % 60);
@@ -26,10 +24,14 @@ export const newTimer = (attrs = {}) => {
   const timer = {
     title: attrs.title || 'Timer',
     project: attrs.project || 'Project',
-    id: uuidv4(),
+    id: generateNumber(),
     elapsed: 0,
     isRunning: false,
   };
 
   return timer;
+};
+
+export const generateNumber = () => {
+   return Math.floor(Math.random()*(1000-2+1)+2);
 };

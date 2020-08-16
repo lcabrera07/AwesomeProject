@@ -1,31 +1,63 @@
 import React from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import PropTypes from 'prop-types';
 
 import TimerButton from './TimerButton';
 import TimerForm from './TimerForm';
 
-export default function ToggleableTimerForm ( { isOpen } ) {
+export default class ToggleableTimerForm extends React.Component
+{
+  static propTypes = {
+    onFormSubmit: PropTypes.func.isRequired,
+  }
 
-  return (
+  state = {
+    isOpen: false,
+  };
 
-    <View
-      stye={
-        [
-          styles.container, !isOpen && styles.buttonPadding
-        ]
-      }
-    >
+  handleFormOpen = () =>
+  {
+    this.setState({isOpen: true});
+  };
 
-      {
+  handleFormClose = () =>
+  {
+    this.setState({isOpen: false});
+  };
 
-        // if it is open then return a empty form, if it is NOT open
-        // then display a button with a black '+'
-        isOpen ? (<TimerForm />) : (<TimerButton title="+" color="black"/>)
+  handleFormSubmit = (timer) => {
+    const{onFormSubmit} = this.props;
 
-      }
+    onFormSubmit( timer );
+    this.setState( {isOpen: false });
+  }
 
-    </View>
-  );
+  render() {
+    const { isOpen } = this.state;
+
+    return (
+
+      <View
+        stye={
+          [
+            styles.container, !isOpen && styles.buttonPadding
+          ]
+        }
+      >
+
+        {
+
+          // if it is open then return a empty form, if it is NOT open
+          // then display a button with a black '+'
+          isOpen ?
+            (<TimerForm onFormClose={this.onFormClose} onFormSubmit={this.handleFormSubmit} />) :
+            (<TimerButton title="+" color="black" onPress={this.handleFormOpen} />)
+
+        }
+
+      </View>
+    );
+  }
 }
 
 const styles = StyleSheet.create({

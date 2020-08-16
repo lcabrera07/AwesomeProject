@@ -1,46 +1,103 @@
 import React from 'react';
 import { StyleSheet, Text, View, TextInput } from 'react-native';
+import PropTypes from 'prop-types';
 
 import TimerButton from './TimerButton';
+import { generateNumber } from '../utils/TimerUtils';
 
-export default function TimerForm({id, title, project}) {
+export default class TimerForm extends React.Component {
 
-  const submitText = id ? 'Update' : 'Create';
+  // we use a constructor because we are checking and defining our state
+  // based on the props passed in
+  constructor(props) {
+    super(props) // we use super here so that we can use 'this' in this constructor method
 
-  return (
+    const { id, title, project } = props;
 
-    <View style={styles.formContainer}>
+    // set this timer forms, if id is undefined (false) then title and project are empty
+    this.state = {
+      title: id ? title : '',
+      project: id ? project : '',
+    };
+  };
 
-      <View style={styles.attributeContainer}>
-        <Text style={styles.textInputTitle}>Title</Text>
-        <View style={styles.textInputContainer}>
-          <TextInput
-            style={styles.textInput}
-            underlineColorAndroid="transparent"
-            defaultValue={title}
-          />
+  static propTypes = {
+    id: PropTypes.string.isRequired,
+    title: PropTypes.string.isRequired,
+    project: PropTypes.string.isRequired,
+    onFormSubmit: PropTypes.func.isRequired,
+    onFormClose: PropTypes.func.isRequired,
+  }
+
+  static defaultProps = {
+    id: '',
+    title: '',
+    project: '',
+  }
+
+  handleTitleChange = title => {
+    this.setState({title})
+  }
+
+  handleProjectChange = project => {
+    this.setState({project});
+  };
+
+  handleSubmit = () => {
+
+    const { id, onFormSubmit } = this.props;
+    const { title, project } = this.state;
+
+    onFormSubmit (
+      {id, title, project,} // this is a data object
+    );
+  }
+
+  render() {
+
+    const { id, onFormClose } = this.props;
+    const { title, project } = this.state;
+
+    const submitText = id ? 'Update' : 'Create';
+
+    return (
+
+      <View style={styles.formContainer}>
+
+        <View style={styles.attributeContainer}>
+          <Text style={styles.textInputTitle}>Title</Text>
+          <View style={styles.textInputContainer}>
+            <TextInput
+              style={styles.textInput}
+              underlineColorAndroid="transparent"
+              onChangeText={this.handleTitleChange}
+              value={title}
+            />
+          </View>
         </View>
-      </View>
 
-      <View style={styles.attributeContainer}>
-        <Text style={styles.textInputStyle}>Project</Text>
-        <View style={styles.textInputContainer}>
-          <TextInput
-            style={styles.textInput}
-            underlineColorAndroid="transparent"
-            defaultValue={project}
-          />
+        <View style={styles.attributeContainer}>
+          <Text style={styles.textInputTitle}>Project</Text>
+          <View style={styles.textInputContainer}>
+            <TextInput
+              style={styles.textInput}
+              underlineColorAndroid="transparent"
+              onChangeText={this.handleProjectChange}
+              value={project}
+            />
+          </View>
         </View>
+
+        <View style={styles.buttonGroup}>
+          <TimerButton small color="#21BA45" title={submitText} onPress={this.handleSubmit} />
+          <TimerButton small color="#DB2828" title="Cancel" onPress={onFormClose} />
+        </View>
+
       </View>
 
-      <View style={styles.buttonGroup}>
-        <TimerButton small color="#21BA45" title={submitText} />
-        <TimerButton small color="#DB2828" title="Cancel" />
-      </View>
+    );
 
-    </View>
-
-  );
+  }
 }
 
 
@@ -67,6 +124,11 @@ const styles = StyleSheet.create({
     height:30,
     padding: 5,
     fontSize: 12,
+  },
+  textInputTitle: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 5,
   },
   buttonGroup: {
     flexDirection: 'row',
