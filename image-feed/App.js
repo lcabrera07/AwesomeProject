@@ -1,23 +1,77 @@
 import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Modal, Platform, StyleSheet, View } from 'react-native';
 import Constants from 'expo-constants';
 
 import Feed from './screens/Feed';
-
-const items = [
-  { id: 1, author: 'Frank Cabrera' },
-  { id: 2, author: 'Diego Cabrera' },
-  { id: 3, author: 'Luis Cabrera' },
-  { id: 4, author: 'Xavier Cabrera' },
-];
+import Comments from './screens/Comments';
 
 export default class App extends React.Component {
+  state = {
+    commentsForItem: {},
+    showModal: false,
+    selectedItemId: null,
+  };
+
+  openCommentScreen = id => {
+    this.setState(
+      {
+        showModal: true,
+        selectedItemId: id,
+      }
+    );
+  };
+
+  closeCommentScreen = () => {
+    this.setState(
+      {
+        showModal: false,
+        selectedItemId: null,
+      }
+    );
+  };
+
+  onSubmitComment = (text) => {
+    const { selectedItemId, commentsForItem } = this.state;
+    const comments = commentsForItem[selectedItemId] || [];
+
+    const updated = {
+      ...commentsForItem,
+      [selectedItemId]: [...comments, text],
+    }
+
+    this.setState(
+      { commentsForItem: updated }
+    );
+  };
+
   render() {
+    const { commentsForItem, showModal, selectedItemId } = this.state;
+
     return (
       <View style={styles.container}>
-        <Feed style={styles.feed} />
+
+        <Feed
+          style={styles.feed}
+          commentsForItem={commentsForItem}
+          onPressComment={this.openCommentScreen}
+        />
+
+        <Modal
+          visible={showModal}
+          animationType="slide"
+          onRequestClose={this.closeCommentScreen}
+        >
+          <Comments
+            style={styles.comments}
+            comments={commentsForItem[selectedItemId]||[]}
+            onClose={this.closeCommentScreen}
+            onSubmitComment={this.onSubmitComment}
+          />
+        </Modal>
+
         <StatusBar style="auto" />
+
       </View>
     );
   }
@@ -31,5 +85,9 @@ const styles = StyleSheet.create({
   },
   feed: {
     flex: 1,
+  },
+  comments: {
+    flex: 1,
+    marginTop: Constants.statusBarHeight,
   },
 });
